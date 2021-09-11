@@ -1,46 +1,43 @@
 <template>
   <div class="bg-blue-200 flex">
     <div>NUJEK</div>
-    <ul>
-      <li v-for="(item, index) in header" :key="index">
-        <nuxt-link :to="getCorrectLink(item.link)">
-          {{ item.label }}
-        </nuxt-link>
-      </li>
-    </ul>
+    <NjNav>
+      <template #burger-menu>
+        <NjBurger :open.sync="isOpenBurger" :classes="{ wrapper: 'md:hidden', bar: 'bg-gray-800' }" />
+      </template>
+
+      <template #logo>
+        <div class="flex flex-shrink-0 w-40 lg:w-48">
+          <nuxt-link to="/" class="block">
+            <img src="/logo.svg" alt="logo">
+          </nuxt-link>
+        </div>
+      </template>
+
+      <template #nav>
+        <div
+          class="flex flex-grow justify-end md:justify-between"
+        >
+          <!-- main nav desktop -->
+          <NjNavItems v-slot="{ label, tag, linkTo }" :items="mainNavItems" class="hidden md:flex space-x-6">
+            <NjNavItem
+              :link-to="linkTo"
+              :tag="tag"
+              :label="label"
+              class="cursor-pointer hover:text-gray-400"
+            />
+          </NjNavItems>
+        </div>
+      </template>
+    </NjNav>
   </div>
 </template>
 
 <script>
-export default {
-  data () {
-    return {
-      header: {}
-    }
-  },
-  async fetch () {
-    const headerData = await this.$storyapi.getStory('header', {
-      resolve_links: 'url'
-    })
+import NjNavMixin from '~nujek-ui/mixins/nav-mixin'
 
-    if (headerData) {
-      this.header = headerData.data.story.content.navigation.map((item) => {
-        return {
-          label: item.label,
-          link: item.link
-        }
-      })
-    }
-  },
-  methods: {
-    getCorrectLink (link) {
-      if (link.linktype === 'story') {
-        return link.story.full_slug
-      } else if (link.linktype === 'url') {
-        return link.url
-      }
-    }
-  }
+export default {
+  mixins: [NjNavMixin]
 }
 </script>
 
